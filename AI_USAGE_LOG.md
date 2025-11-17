@@ -30,10 +30,11 @@ substrings diretamente no arquivo compactado, de forma eficiente e sem a necessi
   2. "Qual seria a linguagem mais indicada para realizar o desafio de forma mais simples e eficiente?"
 
 - **Resumo da Resposta da IA:**
-  A IA explicou que o nível de dificuldade da utilização da linguagem C para o projeto seria muito alto, principalmente devido
+  A IA explicou que o nível de dificuldade da utilização da linguagem C para o projeto seria muito alto, principalmente devido a implementação sem bibliotecas externas. Seria necessário lidar com restrição de memória e arquivos enormes, assim como possuir domínio de vários assuntos avançados em C.
+  Ao perguntar sobre outras linguagens, indicou Python e Java como as melhores opções para o projeto, assim como destacou que com Python seria muito mais simples e produtivo.
 
 - **Análise e Aplicação:**
-  A resposta da IA esclareceu alguns pontos fortes e fracos das linguagens, assim como ajudou a escolher a mais adequada para a elaboração do projeto (Python).
+  A resposta da IA esclareceu alguns pontos fortes e fracos das linguagens e ajudou a escolher a mais adequada para a elaboração do projeto (Python).
 
 
 ### Interação 2
