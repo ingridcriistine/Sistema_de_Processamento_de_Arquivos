@@ -52,4 +52,21 @@ substrings diretamente no arquivo compactado, de forma eficiente e sem a necessi
   Disso foi retirado uma ideia de como diminuir a quantidade de consumo da memória RAM ao ler um arquivo.
 - **Referência no Código:** ...
 
+
+### Interação 3
+
+- **Data:** 23/11/2025
+- **Etapa do Projeto:** Busca de substring em arquivos grandes
+- **Ferramenta de IA Utilizada:** ChatGPT
+- **Objetivo da Consulta:** Queríamos entender melhor sobre a good suffix rule do algoritmo Boyer-Moore
+- **Prompt(s) Utilizado(s):** 
+1. "Explique o funcionamento da good suffix rule do algoritmo Boyer-Moore."
+2. "Explique com exemplos."
+3. "Represente o passo a passo do funcionamento para os valores: Padrao=ARARA e Texto=OARFDKMARAPLARARAF."
+4. "Agora represente o passo a passo do funcionamento para os valores: Padrao=ARCO e Texto=PLMAREFVCOEARCO."
+- **Resumo da Resposta da IA:**
+ Explicou o funcionamento do algoritmo e o passo a passo de exemplos para representar a sua utilização.
+- **Análise e Aplicação:** 
+ Após a explicação foi possível entender melhor como deve ser o comportamento do algoritmo Boyer Moore e criar a função de busca.
+- **Referência no Código:** ...
 ---
