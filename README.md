@@ -14,18 +14,18 @@ Passo a passo para rodar o projeto:
 
 ## Estrutura
 
-├── arquivos/                                       # Arquivos de teste
-├── sistema_de_processamento_de_arquivos/           # Pasta com o código-fonte principal
-    ├── buscar_compactado/                          # Pasta com as funções da etapa 3
-    ├── buscar_simples/                             # Pasta com as funções da etapa 2
-        └── boyer_moore_simples.py                  # Funções gerais de busca de substring em arquivos grandes
-    ├── compactar/                                  # Pasta com as funções da etapa 1
-    ├── __main__.py                                 # 
-    └── cli.py                                      # 
-├── .gitignore                                      # Arquivo gitignore
-└── AI_USAGE_LOG.md                                 # Relatório do uso de IA generativa
-├── gerador_arquivos.py                             # Gera arquivos de texto para teste
-└── README.md                                       # Este documento  
+├── arquivos/                                       # Arquivos de teste  
+├── sistema_de_processamento_de_arquivos/           # Pasta com o código-fonte principal  
+    ├── buscar_compactado/                          # Pasta com as funções da etapa 3  
+    ├── buscar_simples/                             # Pasta com as funções da etapa 2  
+        └── boyer_moore_simples.py                  # Funções gerais de busca de substring em arquivos grandes  
+    ├── compactar/                                  # Pasta com as funções da etapa 1  
+    ├── __main__.py                                 #   
+    └── cli.py                                      #   
+├── .gitignore                                      # Arquivo gitignore  
+└── AI_USAGE_LOG.md                                 # Relatório do uso de IA generativa  
+├── gerador_arquivos.py                             # Gera arquivos de texto para teste  
+└── README.md                                       # Este documento    
 
 ## Etapas do Projeto
 
