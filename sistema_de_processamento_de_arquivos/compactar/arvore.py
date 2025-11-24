@@ -1,5 +1,5 @@
-from fila_prioridade import FilaDePrioridadeManual
-from node import Node
+from .fila_prioridade import FilaDePrioridadeManual
+from .node import Node
 
 def construir_arvore_huffman(freq_map):
     pq = FilaDePrioridadeManual()

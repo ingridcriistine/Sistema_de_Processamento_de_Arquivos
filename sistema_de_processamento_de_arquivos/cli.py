@@ -1,7 +1,6 @@
 import argparse
 from .compactar.compactador import compactar
 from .buscar_simples.boyer_moore_simples import buscar_simples
-from .buscar_simples.boyer_moore_simples import b
 # from .buscar_compactado.compressed_search import buscar_compactado
 
 def main():
@@ -33,6 +32,3 @@ def main():
 
     else:
         parser.print_help()
-
-    if __name__ == "__main__":
-        main()

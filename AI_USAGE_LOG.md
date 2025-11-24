@@ -69,4 +69,20 @@ substrings diretamente no arquivo compactado, de forma eficiente e sem a necessi
 - **Análise e Aplicação:** 
  Após a explicação foi possível entender melhor como deve ser o comportamento do algoritmo Boyer Moore e criar a função de busca.
 - **Referência no Código:** ...
+
+
+### Interação 4
+
+- **Data:** 23/11/2025
+- **Etapa do Projeto:** Busca de substring em arquivos grandes
+- **Ferramenta de IA Utilizada:** Copilot
+- **Objetivo da Consulta:** Precisávamos testar a busca em arquivos grandes
+- **Prompt(s) Utilizado(s):** 
+1. "Preciso gerar um arquivo grande com cerca de 1GB com caracteres aleatórios."
+- **Resumo da Resposta da IA:**
+ Gerou uma função que cria arquivos txt com um tamanho pré-definido.
+- **Análise e Aplicação:** 
+ A utilização da função facilitou os testes do algoritmo e permitiu a criação de arquivos com diferentes tamanho de forma simples e rápida.
+- **Referência no Código:** ...
+
 ---

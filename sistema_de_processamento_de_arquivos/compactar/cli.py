@@ -1,5 +1,5 @@
 import sys
-from compactador import huffman_compactar
+from compactador import compactar
 
 def main():
     if len(sys.argv) != 4:
@@ -12,7 +12,7 @@ def main():
     saida = sys.argv[3]
 
     if comando == "compactar":
-        huffman_compactar(entrada, saida)
+        compactar(entrada, saida)
         print(f"Arquivo compactado com sucesso em: {saida}")
     else:
         print("Comando inválido. Use apenas: compactar")
