@@ -30,7 +30,7 @@ Passo a passo para rodar o projeto:
     ├── __main__.py                                 #   
     └── cli.py                                      #   
 ├── .gitignore                                      # Arquivo gitignore  
-└── AI_USAGE_LOG.md                                 # Relatório do uso de IA generativa  
+├── AI_USAGE_LOG.md                                 # Relatório do uso de IA generativa  
 ├── gerador_arquivos.py                             # Gera arquivos de texto para teste  
 └── README.md                                       # Este documento    
 ```
