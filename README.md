@@ -48,7 +48,7 @@ Passo a passo para rodar o projeto:
 - Comando: `sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
 - Saída: A lista de posições (offsets em bytes) onde a substring foi encontrada.
 - Algoritmo utilizado: Boyer-Moore.
-- Sobre a implementação: 
+- Sobre a implementação: O algoritmo escolhido foi o Boyer-Moore, devido a sua alta velocidade de busca e ocupação de espaço reduzida. As funções foram implementadas com base das referências listadas ao final desse arquivo, e a dificuldade de implementação foi de nível médio, levando em consideração que havia muito conteúdo para auxiliar e explicar o processo. Ao lidar com os blocos de conteúdos para o processamento de arquivos maiores que a memória RAM disponível, o nível de dificuldade aumentou e a adaptação das funções gerou alguns problemas.
 
 ### Etapa 3 | Busca de Substring em Arquivo Comprimido
 - Objetivo: Integrar e evoluir as etapas anteriores para permitir a busca por substring diretamente no arquivo gerado pela Etapa 1, sem descompressão total.
