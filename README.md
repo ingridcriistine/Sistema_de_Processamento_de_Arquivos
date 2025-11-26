@@ -10,9 +10,9 @@ Passo a passo para rodar o projeto:
 1. Pré-requisitos: possuir Python na versão 3.13.3 instalado.
 2.  Comando para executar o código principal.
 - Etapa 1: `sistema_de_processamento_de_arquivos compactar arquivos/<arquivo_original> <arquivo_compactado>`
-- Etapa 2: `sistema_de_processamento_de_arquivos descompactar arquivos/compactados/<arquivo_compactado> <arquivo_descompactado>`
-- Etapa 3: `sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
-- Etapa 4: `sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
+- Etapa 1: `sistema_de_processamento_de_arquivos descompactar arquivos/compactados/<arquivo_compactado> <arquivo_descompactado>`
+- Etapa 2: `sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
+- Etapa 3: `sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
 
 ## Estrutura
 
@@ -20,7 +20,7 @@ Passo a passo para rodar o projeto:
 ├── arquivos/                                       # Arquivos de teste  
 ├── sistema_de_processamento_de_arquivos/           # Pasta com o código-fonte principal  
     ├── buscar_compactado/                          # Pasta com as funções da etapa 3
-        └── 
+        └── boyer_moore_compactado.py               # Funções gerais de busca de substring em arquivos compactados
     ├── buscar_simples/                             # Pasta com as funções da etapa 2  
         └── boyer_moore_simples.py                  # Funções gerais de busca de substring em arquivos grandes  
     ├── compactar/                                  # Pasta com as funções da etapa 1 - compactar
@@ -44,7 +44,9 @@ Passo a passo para rodar o projeto:
 
 ### Etapa 1 | Compressão de Arquivos Grandes 
 - Objetivo: Implementar a funcionalidade de compressão de um arquivo de texto. O algoritmo deve processar o arquivo de entrada garantindo baixo uso de memória.
-- Comando: `sistema_de_processamento_de_arquivos compactar <arquivo_original> <arquivo_compactado>`
+- Comandos: 
+    `sistema_de_processamento_de_arquivos compactar <arquivo_original> <arquivo_compactado>`
+    `sistema_de_processamento_de_arquivos descompactar arquivos/compactados/<arquivo_compactado> <arquivo_descompactado>`
 - Algoritmo utilizado: Huffman.
 - Sobre a implementação: 
 
@@ -58,8 +60,8 @@ Passo a passo para rodar o projeto:
 ### Etapa 3 | Busca de Substring em Arquivo Comprimido
 - Objetivo: Integrar e evoluir as etapas anteriores para permitir a busca por substring diretamente no arquivo gerado pela Etapa 1, sem descompressão total.
 - Comando: `sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
-- Algoritmo utilizado:
-- Sobre a implementação:
+- Algoritmo pensado: Boyer-Moore.
+- Sobre a implementação: A solução pensada para isso consiste em modificar o formato de saída da Etapa 1, dividindo o arquivo original em blocos independentes de compressão e criando um índice que registre, para cada bloco, sua posição no arquivo compactado e a faixa de bytes correspondente no arquivo original. Durante a busca, apenas o índice é carregado em memória, e o programa passa a descompactar seletivamente apenas os blocos relevantes, aplicando o algoritmo de busca em cada um deles. Quando necessário, também deve verificar ocorrências que cruzam a fronteira entre dois blocos, combinando o final de um bloco com o início do próximo - como já implementado na Etapa 2. Embora tenhamos compreendido a arquitetura necessária, a implementação exigiria muitas alterações no compressor e no descompressor desenvolvidos na Etapa 1, o que acabou ultrapassando o tempo disponível. Por isso, não foi possível concluir completamente a etapa, mas a lógica e o desenho da solução foram estudados e compreendidos.
   
 ## Autores
 
