@@ -20,16 +20,15 @@ def buscar_simples(arquivo_original, pat, block_size=4096):
                 break
         
             texto = sobra + bloco
+            
+            # constrói mapa de bytes para o texto todo
+            byte_map = mapa_bytes(texto)
+            
             matches = boyer_moore_chunk(texto, pat, bad_char, good_suffix)
             
             for pos in matches:
                 if pos >= len(sobra):
-                    # Posição em caracteres dentro do bloco atual
-                    pos_char = pos - len(sobra)
-                    
-                    # Convertemos o trecho até a posição para bytes
-                    bytes_antes = texto[:pos].encode("utf-8")
-                    pos_byte = len(bytes_antes)
+                    pos_byte = byte_map[pos]
                     
                     # combinacoes.append(offset + pos - len(sobra)) #posição inicial da combinação
                     combinacoes.append(offset + pos_byte) #qtd de bytes ate a posição inicial
@@ -40,6 +39,12 @@ def buscar_simples(arquivo_original, pat, block_size=4096):
         
     print("Ocorrências encontradas (offsets em bytes):", combinacoes)
     return combinacoes
+
+def mapa_bytes(texto):
+    byte_pos = [0]
+    for ch in texto:
+        byte_pos.append(byte_pos[-1] + len(ch.encode("utf-8")))
+    return byte_pos
         
 def boyer_moore_chunk(txt, pat, bad_char, good_suffix):
     m = len(pat)
@@ -91,7 +96,6 @@ def good_suffix_rule(pat):
             j = border_positions[j]
         i -= 1
         j -= 1
-        
         border_positions[i] = j
         
     #preenche valores que faltaram

@@ -9,9 +9,9 @@ Projeto final da disciplina Estrutura de Dados II - UFPR
 Passo a passo para rodar o projeto:
 1. Pré-requisitos: possuir Python na versão 3.13.3 instalado.
 2.  Comando para executar o código principal.
-- Etapa 1: `sistema_de_processamento_de_arquivos compactar <arquivo_original> <arquivo_compactado>`
-- Etapa 2: `sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
-- Etapa 3: `sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
+- Etapa 1: `python -m sistema_de_processamento_de_arquivos compactar <arquivo_original> <arquivo_compactado>`
+- Etapa 2: `python -m sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
+- Etapa 3: `python -m sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
 
 ## Estrutura
 
