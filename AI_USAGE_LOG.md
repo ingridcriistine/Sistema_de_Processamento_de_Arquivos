@@ -68,7 +68,7 @@ substrings diretamente no arquivo compactado, de forma eficiente e sem a necessi
  Explicou o funcionamento do algoritmo e o passo a passo de exemplos para representar a sua utilização.
 - **Análise e Aplicação:** 
  Após a explicação foi possível entender melhor como deve ser o comportamento do algoritmo Boyer Moore e criar a função de busca.
-- **Referência no Código:** ...
+- **Referência no Código:** A função foi implementada no arquivo `buscar_simples/boyer_moore_simples.py`, especificamente na função `good_suffix_rule`.
 
 
 ### Interação 4
@@ -83,6 +83,6 @@ substrings diretamente no arquivo compactado, de forma eficiente e sem a necessi
  Gerou uma função que cria arquivos txt com um tamanho pré-definido.
 - **Análise e Aplicação:** 
  A utilização da função facilitou os testes do algoritmo e permitiu a criação de arquivos com diferentes tamanho de forma simples e rápida.
-- **Referência no Código:** ...
+- **Referência no Código:** A implementação está no arqivo `gerador_arqivos.py`.
 
 ---
