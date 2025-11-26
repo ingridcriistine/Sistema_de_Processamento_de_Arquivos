@@ -11,8 +11,8 @@ Passo a passo para rodar o projeto:
 2.  Comando para executar o código principal.
 - Etapa 1: `sistema_de_processamento_de_arquivos compactar arquivos/<arquivo_original> <arquivo_compactado>`
 - Etapa 2: `sistema_de_processamento_de_arquivos descompactar arquivos/compactados/<arquivo_compactado> <arquivo_descompactado>`
-- Etapa 2: `sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
-- Etapa 3: `sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
+- Etapa 3: `sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
+- Etapa 4: `sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
 
 ## Estrutura
 
@@ -65,7 +65,10 @@ Passo a passo para rodar o projeto:
 ## Referências
 
 ETAPA 1
-- []()
+- [Entendendo o algoritmo de Huffman | Compressão | Árvore binária](https://youtu.be/4hHZdTfWZtQ?si=DYzVMvTkR2qSPCA4)
+- [Huffman Coding - Python Implementation and Demo](https://youtu.be/JCOph23TQTY?si=0RuYMkOfdrHB9_L_)
+- [Text File Compression And Decompression Using Huffman Coding](https://www.geeksforgeeks.org/dsa/text-file-compression-and-decompression-using-huffman-coding/)
+
 
 ETAPA 2
 - [Boyer Moore Algorithm | Good Suffix heuristic](https://www.geeksforgeeks.org/dsa/boyer-moore-algorithm-good-suffix-heuristic/)
