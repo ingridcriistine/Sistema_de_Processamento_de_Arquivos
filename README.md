@@ -23,13 +23,17 @@ Passo a passo para rodar o projeto:
         └── 
     ├── buscar_simples/                             # Pasta com as funções da etapa 2  
         └── boyer_moore_simples.py                  # Funções gerais de busca de substring em arquivos grandes  
-    ├── compactar/                                  # Pasta com as funções da etapa 1
-        ├──                                         #   
-        ├──                                         #   
-        ├──                                         #   
-        └──                                         #   
+    ├── compactar/                                  # Pasta com as funções da etapa 1 - compactar
+        ├── arvore.py                               #   
+        ├── codigos.py                              #   
+        ├── compactador.py                          # Função geral de compactação de arquivos
+        ├── fila_prioridade.py                      #   
+        ├── lendo_arquivo.py                        #   
+        └── node.py                                 #
+    ├── descompactar/                               # Pasta com as funções da etapa 1 - descompactar
+        └── descompactar.py                         # Função geral de descompactação de arquivos
     ├── __main__.py                                 #   
-    └── cli.py                                      #   
+    └── cli.py                                      # Arquivo principal do programa que ser executado no terminal
 ├── .gitignore                                      # Arquivo gitignore  
 ├── AI_USAGE_LOG.md                                 # Relatório do uso de IA generativa  
 ├── gerador_arquivos.py                             # Gera arquivos de texto para teste  
@@ -49,7 +53,7 @@ Passo a passo para rodar o projeto:
 - Comando: `sistema_de_processamento_de_arquivos buscar_simples arquivos/<arquivo_original> "<substring>"`
 - Saída: A lista de posições (offsets em bytes) onde a substring foi encontrada.
 - Algoritmo utilizado: Boyer-Moore.
-- Sobre a implementação: O algoritmo escolhido foi o Boyer-Moore, devido a sua alta velocidade de busca e ocupação de espaço reduzida. As funções foram implementadas com base das referências listadas ao final desse arquivo, e a dificuldade de implementação foi de nível médio, levando em consideração que havia muito conteúdo para auxiliar e explicar o processo. Ao lidar com os blocos de conteúdos para o processamento de arquivos maiores que a memória RAM disponível, o nível de dificuldade aumentou e a adaptação das funções gerou alguns problemas.
+- Sobre a implementação: O algoritmo escolhido foi o Boyer-Moore, devido a sua alta velocidade de busca e ocupação de espaço reduzida. As funções foram implementadas com base nas referências listadas ao final d0 arquivo, e a dificuldade de implementação foi de nível médio, levando em consideração que havia muito conteúdo para auxiliar e explicar o processo. Ao lidar com os blocos de conteúdos para o processamento de arquivos maiores que a memória RAM disponível, assim como o problema de fronteiras, o nível de dificuldade aumentou e a adaptação das funções gerou alguns problemas.
 
 ### Etapa 3 | Busca de Substring em Arquivo Comprimido
 - Objetivo: Integrar e evoluir as etapas anteriores para permitir a busca por substring diretamente no arquivo gerado pela Etapa 1, sem descompressão total.
