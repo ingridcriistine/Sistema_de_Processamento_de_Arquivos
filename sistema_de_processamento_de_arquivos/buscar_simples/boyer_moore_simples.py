@@ -1,42 +1,39 @@
 def buscar_simples(arquivo_original, pat, block_size=4096):
     print(f"Buscando '{pat}' em {arquivo_original}" )
-    
     m = len(pat)
+
     if m == 0:
         print("Padrão vazio")
         return []
-    
     bad_char = bad_character_rule(pat)
     good_suffix = good_suffix_rule(pat)
-    
     combinacoes = []
-    offset = 0             
+    offset = 0              
     sobra = ""
-    
+
     with open(arquivo_original, "r", encoding="utf-8") as arquivo:
         while True:
             bloco = arquivo.read(block_size)
             if not bloco:
                 break
-        
             texto = sobra + bloco
+            texto = texto.replace("\n", "")
             
-            # constrói mapa de bytes para o texto todo
             byte_map = mapa_bytes(texto)
-            
             matches = boyer_moore_chunk(texto, pat, bad_char, good_suffix)
-            
+            sobra_bytes = len(sobra.encode("utf-8"))
+
+            base = offset - sobra_bytes  
             for pos in matches:
-                if pos >= len(sobra):
+                if pos + m > len(sobra):
                     pos_byte = byte_map[pos]
-                    
+                    combinacoes.append(base + pos_byte)
                     # combinacoes.append(offset + pos - len(sobra)) #posição inicial da combinação
-                    combinacoes.append(offset + pos_byte) #qtd de bytes ate a posição inicial
-            
+
             sobra = texto[-(m-1):] if m > 1 else ""
             # offset += len(bloco)
             offset += len(bloco.encode("utf-8"))
-        
+
     print("Ocorrências encontradas (offsets em bytes):", combinacoes)
     return combinacoes
 

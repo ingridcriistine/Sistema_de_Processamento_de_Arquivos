@@ -85,4 +85,5 @@ ETAPA 2
 - [ADS1: Boyer-Moore basics](https://youtu.be/4Xyhb72LCX4?si=8fisJb5VXY8qzbbv)
 
 ETAPA 3
-- []()
+- [Search and Retrieval of Compressed Text](https://www.sciencedirect.com/science/chapter/bookseries/abs/pii/S0065245804630063?utm_source=chatgpt.com)
+- [Is there a compression format that allows decompression at any point in the file?](https://stackoverflow.com/questions/41896388/is-there-a-compression-format-that-allows-decompression-at-any-point-in-the-file?utm_source=chatgpt.com)
