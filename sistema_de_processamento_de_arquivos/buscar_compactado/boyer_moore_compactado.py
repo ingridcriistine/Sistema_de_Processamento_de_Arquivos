@@ -1,8 +1,6 @@
-# buscar_indexado.py (ou onde estava buscar_substring_compactado)
 import json
 
 def descompactar_bloco(codigos, compressed_bytes, padding):
-    # mesmo descompactador de bloco usado acima
     codigos_inv = {v: k for k, v in codigos.items()}
     bits = "".join(f"{byte:08b}" for byte in compressed_bytes)
     if padding:
@@ -27,7 +25,6 @@ def buscar_substring_compactado(entrada, padrao):
         tabela_json = f_in.read(tam_tabela).decode("utf-8")
         codigos = json.loads(tabela_json)
 
-        # read index
         index_offset = int.from_bytes(f_in.read(8), "big")
         f_in.seek(index_offset)
         index_size = int.from_bytes(f_in.read(4), "big")
@@ -58,12 +55,17 @@ def buscar_substring_compactado(entrada, padrao):
             pos = janela.find(padrao)
             while pos != -1:
                
-                byte_offset_within_janela = len(janela[:pos].encode('utf-8'))
+                if pos >= len(ultimo_final):
+                    dentro = pos - len(ultimo_final)
+                    byte_offset = len(texto[:dentro].encode("utf-8"))
+                    pos_global = orig_start + byte_offset
+                else:
+                    ajuste_prev = orig_start - len(ultimo_final.encode("utf-8"))
+                    byte_offset = len(janela[:pos].encode("utf-8"))
+                    pos_global = ajuste_prev + byte_offset
 
-                bytes_before_texto = len(ultimo_final.encode('utf-8'))
-                pos_global_bytes = orig_start - bytes_before_texto + byte_offset_within_janela
-
-                resultados.append(pos_global_bytes)
+                resultados.append(pos_global)
+                                
                 pos = janela.find(padrao, pos + 1)
 
             if m_chars > 1:
