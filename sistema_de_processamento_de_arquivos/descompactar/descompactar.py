@@ -34,60 +34,43 @@ import json
 
 def descompactar_bloco(codigos, compressed_bytes, padding):
     codigos_inv = {v: k for k, v in codigos.items()}
-
-    bits = ""
-    for byte in compressed_bytes:
-        bits += f"{byte:08b}"
-
+    bits = "".join(f"{byte:08b}" for byte in compressed_bytes)
     if padding:
         bits = bits[:-padding]
-
     atual = ""
-    resultado = []
+    out_chars = []
     for b in bits:
         atual += b
         if atual in codigos_inv:
-            resultado.append(codigos_inv[atual])
+            out_chars.append(codigos_inv[atual])
             atual = ""
-    return "".join(resultado)
+    return "".join(out_chars)
+
 
 def descompactar(entrada, saida):
-    print("\n=== INICIANDO DESCOMPACTAÇÃO POR BLOCOS ===")
-
+    print("\n=== INICIANDO DESCOMPACTAÇÃO INDEXADA ===")
     with open(entrada, "rb") as f_in, open(saida, "w", encoding="utf-8") as f_out:
-
         tam_tabela = int.from_bytes(f_in.read(4), "big")
         tabela_json = f_in.read(tam_tabela).decode("utf-8")
         codigos = json.loads(tabela_json)
 
-        codigos_inv = {v: k for k, v in codigos.items()}
+        index_offset = int.from_bytes(f_in.read(8), "big")
+        f_in.seek(index_offset)
 
-        while True:
+        index_size = int.from_bytes(f_in.read(4), "big")
+        index_entries = json.loads(f_in.read(index_size).decode("utf-8"))
 
-            bloco_size_bytes = f_in.read(4)
-            if not bloco_size_bytes:
-                break 
+        for entry in index_entries:
+            comp_start = entry["comp_start"]
+            comp_size  = entry["comp_size"]
+            padding    = entry["padding"]
 
-            bloco_size = int.from_bytes(bloco_size_bytes, "big")
+            f_in.seek(comp_start)
+            actual_comp_size = int.from_bytes(f_in.read(4), "big")
+            if actual_comp_size != comp_size:
+                raise ValueError("comp_size mismatch")
+            bloco_comp = f_in.read(comp_size)
+            texto = descompactar_bloco(codigos, bloco_comp, padding)
+            f_out.write(texto)
 
-            bloco_comp = f_in.read(bloco_size)
-
-            indice_size = int.from_bytes(f_in.read(4), "big")
-
-            indice_json = json.loads(f_in.read(indice_size).decode("utf-8"))
-            padding = indice_json["padding"]
-
-            bits = ""
-            for byte in bloco_comp:
-                bits += f"{byte:08b}"
-
-            if padding:
-                bits = bits[:-padding]
-
-            atual = ""
-            for b in bits:
-                atual += b
-                if atual in codigos_inv:
-                    f_out.write(codigos_inv[atual])
-                    atual = ""
-
+    print("Descompactação concluída.")

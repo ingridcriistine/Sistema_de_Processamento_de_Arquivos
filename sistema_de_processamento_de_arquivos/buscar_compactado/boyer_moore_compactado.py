@@ -1,62 +1,74 @@
+# buscar_indexado.py (ou onde estava buscar_substring_compactado)
 import json
 
+def descompactar_bloco(codigos, compressed_bytes, padding):
+    # mesmo descompactador de bloco usado acima
+    codigos_inv = {v: k for k, v in codigos.items()}
+    bits = "".join(f"{byte:08b}" for byte in compressed_bytes)
+    if padding:
+        bits = bits[:-padding]
+    atual = ""
+    out_chars = []
+    for b in bits:
+        atual += b
+        if atual in codigos_inv:
+            out_chars.append(codigos_inv[atual])
+            atual = ""
+    return "".join(out_chars)
+
+
 def buscar_substring_compactado(entrada, padrao):
-    print(f"\n=== BUSCANDO '{padrao}' NO ARQUIVO COMPACTADO ===")
-
-    m = len(padrao)
-
+    print(f"\n=== BUSCANDO '{padrao}' NO ARQUIVO COMPACTADO (INDEXADO) ===")
+    m_chars = len(padrao) 
     resultados = []
 
-    ultimo_final = ""   
-
     with open(entrada, "rb") as f_in:
-
         tam_tabela = int.from_bytes(f_in.read(4), "big")
         tabela_json = f_in.read(tam_tabela).decode("utf-8")
         codigos = json.loads(tabela_json)
-        codigos_inv = {v: k for k, v in codigos.items()}
 
-        while True:
-            bloco_size_bytes = f_in.read(4)
-            if not bloco_size_bytes:
-                break
+        # read index
+        index_offset = int.from_bytes(f_in.read(8), "big")
+        f_in.seek(index_offset)
+        index_size = int.from_bytes(f_in.read(4), "big")
+        index_entries = json.loads(f_in.read(index_size).decode("utf-8"))
 
-            bloco_size = int.from_bytes(bloco_size_bytes, "big")
-            bloco_comp = f_in.read(bloco_size)
+        ultimo_final = "" 
 
-            indice_size = int.from_bytes(f_in.read(4), "big")
-            indice_json = json.loads(f_in.read(indice_size).decode("utf-8"))
+        for entry in index_entries:
+            orig_start = entry["orig_start"]  
+            orig_end   = entry["orig_end"]
+            comp_start = entry["comp_start"]
+            comp_size  = entry["comp_size"]
+            padding    = entry["padding"]
 
-            start_global = indice_json["start_global"]
-            end_global   = indice_json["end_global"]
-            padding      = indice_json["padding"]
+            if orig_end < orig_start:
+                continue
 
-            bits = ""
-            for byte in bloco_comp:
-                bits += f"{byte:08b}"
+            f_in.seek(comp_start)
+            actual_comp_size = int.from_bytes(f_in.read(4), "big")
+            if actual_comp_size != comp_size:
+                raise ValueError("comp_size mismatch during search")
+            bloco_comp = f_in.read(comp_size)
 
-            if padding:
-                bits = bits[:-padding]
+            texto = descompactar_bloco(codigos, bloco_comp, padding)
 
-            texto = ""
-            atual = ""
-            for b in bits:
-                atual += b
-                if atual in codigos_inv:
-                    texto += codigos_inv[atual]
-                    atual = ""
-
-           
             janela = ultimo_final + texto
 
-       
             pos = janela.find(padrao)
             while pos != -1:
-                pos_global = start_global - len(ultimo_final) + pos
-                if start_global <= pos_global <= end_global:
-                    resultados.append(pos_global)
-                pos = janela.find(padrao, pos+1)
-           
-            ultimo_final = texto[-(m-1):] if m > 1 else ""
+               
+                byte_offset_within_janela = len(janela[:pos].encode('utf-8'))
+
+                bytes_before_texto = len(ultimo_final.encode('utf-8'))
+                pos_global_bytes = orig_start - bytes_before_texto + byte_offset_within_janela
+
+                resultados.append(pos_global_bytes)
+                pos = janela.find(padrao, pos + 1)
+
+            if m_chars > 1:
+                ultimo_final = (ultimo_final + texto)[- (m_chars - 1):] if (m_chars - 1) > 0 else ""
+            else:
+                ultimo_final = ""
 
     return resultados

@@ -65,61 +65,75 @@ class PrimeiraLeituraStreaming:
 class SegundaLeituraStreaming:
     def __init__(self, caminho, codigos, block_size=4096):
         self.caminho = caminho
-        self.codigos = codigos
+        self.codigos = codigos  # map char -> bitstring
         self.block_size = block_size
 
+    def _comprimir_bloco_para_bytes(self, texto_bloco):
+        buffer_bits = ""
+        out = bytearray()
+        for ch in texto_bloco:
+            buffer_bits += self.codigos[ch]
+            while len(buffer_bits) >= 8:
+                byte = int(buffer_bits[:8], 2)
+                out.append(byte)
+                buffer_bits = buffer_bits[8:]
+        padding = 0
+        if buffer_bits:
+            padding = 8 - len(buffer_bits)
+            buffer_bits = buffer_bits.ljust(8, "0")
+            out.append(int(buffer_bits, 2))
+        return bytes(out), padding
+
     def comprimir_para_blocos(self, saida):
-
         tabela_json = json.dumps(self.codigos).encode("utf-8")
-        tamanho_tabela = len(tabela_json)
+        tam_tabela = len(tabela_json)
 
-        with open(saida, "wb") as f_out:
+        index_entries = []
 
-            f_out.write(tamanho_tabela.to_bytes(4, "big"))
+        current_orig_pos_bytes = 0
+
+        with open(self.caminho, "r", encoding="utf-8") as f_in, open(saida, "wb") as f_out:
+            f_out.write(tam_tabela.to_bytes(4, "big"))
             f_out.write(tabela_json)
-            
-            with open(self.caminho, "r", encoding="utf-8") as f_in:
 
-                global_pos = 0  
-                while True:
-                    bloco = f_in.read(self.block_size)
-                    if not bloco:
-                        break
+            index_offset_pos = f_out.tell()
+            f_out.write((0).to_bytes(8, "big"))
 
-                    buffer_bits = ""
-                    bloco_bytes = bytearray()
+            while True:
+                bloco = f_in.read(self.block_size) 
+                if not bloco:
+                    break
 
-                    for ch in bloco:
-                        buffer_bits += self.codigos[ch]
+                bloco_comp_bytes, padding = self._comprimir_bloco_para_bytes(bloco)
 
-                        while len(buffer_bits) >= 8:
-                            byte = int(buffer_bits[:8], 2)
-                            bloco_bytes.append(byte)
-                            buffer_bits = buffer_bits[8:]
+                comp_start = f_out.tell()
 
-                    padding = 0
-                    if buffer_bits:
-                        padding = 8 - len(buffer_bits)
-                        buffer_bits = buffer_bits.ljust(8, "0")
-                        bloco_bytes.append(int(buffer_bits, 2))
+                comp_size = len(bloco_comp_bytes)
 
-                    bloco_size = len(bloco_bytes)
+                f_out.write(comp_size.to_bytes(4, "big"))
+                if comp_size:
+                    f_out.write(bloco_comp_bytes)
 
-                    f_out.write(bloco_size.to_bytes(4, "big"))
+                bloco_original_bytes = bloco.encode("utf-8")
+                orig_start = current_orig_pos_bytes
+                orig_end = current_orig_pos_bytes + len(bloco_original_bytes) - 1 if len(bloco_original_bytes) > 0 else current_orig_pos_bytes - 1
 
-                    f_out.write(bytes(bloco_bytes))
+                entry = {
+                    "orig_start": orig_start,
+                    "orig_end": orig_end,
+                    "comp_start": comp_start,
+                    "comp_size": comp_size,
+                    "padding": padding
+                }
+                index_entries.append(entry)
 
-                    indice = {
-                        "start_global": global_pos,
-                        "end_global": global_pos + len(bloco) - 1,
-                        "padding": padding
-                    }
+                current_orig_pos_bytes += len(bloco_original_bytes)
 
-                    indice_json = json.dumps(indice).encode("utf-8")
-                    indice_size = len(indice_json)
+            index_start = f_out.tell()
+            index_json = json.dumps(index_entries).encode("utf-8")
+            index_size = len(index_json)
+            f_out.write(index_size.to_bytes(4, "big"))
+            f_out.write(index_json)
 
-                    f_out.write(indice_size.to_bytes(4, "big"))
-
-                    f_out.write(indice_json)
-
-                    global_pos += len(bloco)
+            f_out.seek(index_offset_pos)
+            f_out.write(index_start.to_bytes(8, "big"))
