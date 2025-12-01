@@ -47,6 +47,7 @@ Passo a passo para rodar o projeto:
 - Comandos: 
     `sistema_de_processamento_de_arquivos compactar <arquivo_original> <arquivo_compactado>`
     `sistema_de_processamento_de_arquivos descompactar arquivos/compactados/<arquivo_compactado> <arquivo_descompactado>`
+    `sistema_de_processamento_de_arquivos buscar_compactado <arquivo_compactado> arquivos/compactados/<arquivo_compactado> `
 - Algoritmo utilizado: Huffman.
 - Sobre a implementação: 
 
@@ -59,7 +60,7 @@ Passo a passo para rodar o projeto:
 
 ### Etapa 3 | Busca de Substring em Arquivo Comprimido
 - Objetivo: Integrar e evoluir as etapas anteriores para permitir a busca por substring diretamente no arquivo gerado pela Etapa 1, sem descompressão total.
-- Comando: `sistema_de_processamento_de_arquivos buscar_compactado arquivos/<arquivo_compactado> "<substring>"`
+- Comando: `sistema_de_processamento_de_arquivos buscar_compactado <arquivo_compactado> arquivos/compactados/<arquivo_compactado> `
 - Algoritmo pensado: Boyer-Moore.
 - Sobre a implementação: A solução pensada para isso consiste em modificar o formato de saída da Etapa 1, dividindo o arquivo original em blocos independentes de compressão e criando um índice que registre, para cada bloco, sua posição no arquivo compactado e a faixa de bytes correspondente no arquivo original. Durante a busca, apenas o índice é carregado em memória, e o programa passa a descompactar seletivamente apenas os blocos relevantes, aplicando o algoritmo de busca em cada um deles. Quando necessário, também deve verificar ocorrências que cruzam a fronteira entre dois blocos, combinando o final de um bloco com o início do próximo - como já implementado na Etapa 2. Embora tenhamos compreendido a arquitetura necessária, a implementação exigiria muitas alterações no compressor e no descompressor desenvolvidos na Etapa 1, o que acabou ultrapassando o tempo disponível. Por isso, não foi possível concluir completamente a etapa, mas a lógica e o desenho da solução foram estudados e compreendidos.
   

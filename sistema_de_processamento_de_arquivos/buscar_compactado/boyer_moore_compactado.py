@@ -1,59 +1,62 @@
 import json
 
-def buscar_substring(txt, pat):
-    m = len(pat)
-    res = []
-    for i in range(len(txt) - m + 1):
-        if txt[i:i+m] == pat:
-            res.append(i)
-    return res
+def buscar_substring_compactado(entrada, padrao):
+    print(f"\n=== BUSCANDO '{padrao}' NO ARQUIVO COMPACTADO ===")
 
+    m = len(padrao)
 
-def buscar_compactado(arq, substring):
     resultados = []
-    m = len(substring)
 
-    with open(arq, "rb") as f:
+    ultimo_final = ""   
 
-        tam_idx = int.from_bytes(f.read(4), "big")
-        idx_json = f.read(tam_idx).decode("utf-8")
-        indice = json.loads(idx_json)
+    with open(entrada, "rb") as f_in:
 
-        padding_global = f.read(1)[0]
+        tam_tabela = int.from_bytes(f_in.read(4), "big")
+        tabela_json = f_in.read(tam_tabela).decode("utf-8")
+        codigos = json.loads(tabela_json)
+        codigos_inv = {v: k for k, v in codigos.items()}
 
-        base_offset = 4 + tam_idx + 1
+        while True:
+            bloco_size_bytes = f_in.read(4)
+            if not bloco_size_bytes:
+                break
 
-        sufixo_anterior = ""
+            bloco_size = int.from_bytes(bloco_size_bytes, "big")
+            bloco_comp = f_in.read(bloco_size)
 
-        for bloco in indice:
+            indice_size = int.from_bytes(f_in.read(4), "big")
+            indice_json = json.loads(f_in.read(indice_size).decode("utf-8"))
 
-            comp_offset  = bloco["comp_offset"]
-            comp_size    = bloco["comp_size"]
-            orig_offset  = bloco["orig_offset"]
-            codigos      = bloco["codigos"]
-            padding      = bloco["padding"]   
+            start_global = indice_json["start_global"]
+            end_global   = indice_json["end_global"]
+            padding      = indice_json["padding"]
 
-            f.seek(base_offset + comp_offset)
-            compressed = f.read(comp_size)
+            bits = ""
+            for byte in bloco_comp:
+                bits += f"{byte:08b}"
 
-            dados = descompactar_bloco(codigos, compressed, padding)
+            if padding:
+                bits = bits[:-padding]
 
-            for pos in buscar_substring(dados, substring):
-                resultados.append(orig_offset + pos)
+            texto = ""
+            atual = ""
+            for b in bits:
+                atual += b
+                if atual in codigos_inv:
+                    texto += codigos_inv[atual]
+                    atual = ""
 
-            if len(sufixo_anterior) > 0:
+           
+            janela = ultimo_final + texto
 
-                janela = sufixo_anterior + dados
-                posicoes = buscar_substring(janela, substring)
-
-                for p in posicoes:
-                    if p < len(sufixo_anterior):
-                        offset_real = orig_offset - len(sufixo_anterior) + p
-                        resultados.append(offset_real)
-
-            if len(dados) >= m-1:
-                sufixo_anterior = dados[-(m-1):]
-            else:
-                sufixo_anterior = dados
+       
+            pos = janela.find(padrao)
+            while pos != -1:
+                pos_global = start_global - len(ultimo_final) + pos
+                if start_global <= pos_global <= end_global:
+                    resultados.append(pos_global)
+                pos = janela.find(padrao, pos+1)
+           
+            ultimo_final = texto[-(m-1):] if m > 1 else ""
 
     return resultados

@@ -29,7 +29,7 @@ def compactar(entrada, saida):
             print(f"{char}: {code}")
 
     leitor2 = SegundaLeituraStreaming(entrada, codigos)
-    leitor2.comprimir_para_binario(saida)
+    leitor2.comprimir_para_blocos(saida)
 
     print("\nArquivo compactado com sucesso!")
     print(f"Saída: {saida}")

@@ -1,9 +1,10 @@
 import argparse
 import os
+
+from sistema_de_processamento_de_arquivos.buscar_compactado.boyer_moore_compactado import buscar_substring_compactado
 from .compactar.compactador import compactar
 from .buscar_simples.boyer_moore_simples import buscar_simples
 from .descompactar.descompactar import descompactar
-# from .buscar_compactado.compressed_search import buscar_compactado
 
 def main():
     parser = argparse.ArgumentParser(prog="meu_programa")
@@ -25,9 +26,9 @@ def main():
     p_simples.add_argument("substring")
     
     # --- Buscar compactado (se fizer depois) ---
-    # p_comp = subparsers.add_parser("buscar_compactado", help="Busca em arquivos compactados")
-    # p_comp.add_argument("arquivo_compactado")
-    # p_comp.add_argument("substring")
+    p_comp = subparsers.add_parser("buscar_compactado", help="Busca em arquivos compactados")
+    p_comp.add_argument("arquivo_compactado")
+    p_comp.add_argument("substring")
 
     args = parser.parse_args()
     
@@ -41,9 +42,18 @@ def main():
         saida = os.path.join(pasta_desc, args.arquivo_descompactado)
         descompactar(args.arquivo_compactado, saida)
 
-
     elif args.comando == "buscar_simples":
         buscar_simples(args.arquivo_original, args.substring)
+
+    elif args.comando == "buscar_compactado":
+        resultados = buscar_substring_compactado(args.arquivo_compactado, args.substring)
+
+        if resultados:
+            print("\nOcorrências encontradas nos offsets (arquivo original):")
+            for pos in resultados:
+                print(pos)
+        else:
+            print("\nNenhuma ocorrência encontrada.")
 
     else:
         parser.print_help()
