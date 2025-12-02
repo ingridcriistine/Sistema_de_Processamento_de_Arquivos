@@ -48,9 +48,10 @@ def buscar_substring_compactado(entrada, padrao):
                 raise ValueError("comp_size mismatch during search")
             bloco_comp = f_in.read(comp_size)
 
-            texto = descompactar_bloco(codigos, bloco_comp, padding)
+            texto = descompactar_bloco(codigos, bloco_comp, padding).replace("\n", "")
+            ultimo_final = ultimo_final.replace("\n", "")
+            janela = (ultimo_final + texto)
 
-            janela = ultimo_final + texto
 
             pos = janela.find(padrao)
             while pos != -1:

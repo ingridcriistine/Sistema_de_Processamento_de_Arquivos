@@ -44,7 +44,8 @@ def descompactar_bloco(codigos, compressed_bytes, padding):
         if atual in codigos_inv:
             out_chars.append(codigos_inv[atual])
             atual = ""
-    return "".join(out_chars)
+    return "".join(out_chars).replace("\n", "")
+
 
 
 def descompactar(entrada, saida):
