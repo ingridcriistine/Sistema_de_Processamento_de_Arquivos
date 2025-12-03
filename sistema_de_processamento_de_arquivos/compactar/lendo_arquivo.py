@@ -63,77 +63,87 @@ class PrimeiraLeituraStreaming:
 #             f_out.write(bytes([padding]))
 
 class SegundaLeituraStreaming:
-    def __init__(self, caminho, codigos, block_size=4096):
-        self.caminho = caminho
-        self.codigos = codigos  # map char -> bitstring
-        self.block_size = block_size
+    def __init__(self, caminho_arquivo, tabela_codigos, tamanho_bloco=4096):
+        self.caminho_arquivo = caminho_arquivo
+        self.codigos = tabela_codigos      # mapa: caractere → sequência de bits
+        self.tamanho_bloco = tamanho_bloco
 
-    def _comprimir_bloco_para_bytes(self, texto_bloco):
-        buffer_bits = ""
-        out = bytearray()
-        for ch in texto_bloco:
-            buffer_bits += self.codigos[ch]
-            while len(buffer_bits) >= 8:
-                byte = int(buffer_bits[:8], 2)
-                out.append(byte)
-                buffer_bits = buffer_bits[8:]
+    def _comprimir_bloco(self, bloco_texto):
+        bits_acumulados = ""
+        bytes_compactados = bytearray()
+
+        for caractere in bloco_texto:
+            bits_acumulados += self.codigos[caractere]
+
+            # Cada vez que tivermos 8 bits, convertemos para byte
+            while len(bits_acumulados) >= 8:
+                byte = int(bits_acumulados[:8], 2)
+                bytes_compactados.append(byte)
+                bits_acumulados = bits_acumulados[8:]
+
         padding = 0
-        if buffer_bits:
-            padding = 8 - len(buffer_bits)
-            buffer_bits = buffer_bits.ljust(8, "0")
-            out.append(int(buffer_bits, 2))
-        return bytes(out), padding
+        if bits_acumulados:
+            padding = 8 - len(bits_acumulados)
+            bits_acumulados = bits_acumulados.ljust(8, "0")
+            bytes_compactados.append(int(bits_acumulados, 2))
 
-    def comprimir_para_blocos(self, saida):
+        return bytes(bytes_compactados), padding
+
+    # Compacta o arquivo inteiro em blocos + cria índice
+    def comprimir_para_blocos(self, caminho_saida):
+
         tabela_json = json.dumps(self.codigos).encode("utf-8")
-        tam_tabela = len(tabela_json)
+        tamanho_tabela = len(tabela_json)
 
-        index_entries = []
+        indice = []                     
+        posicao_atual_original = 0    
 
-        current_orig_pos_bytes = 0
+        with open(self.caminho_arquivo, "r", encoding="utf-8") as arquivo_in, \
+             open(caminho_saida, "wb") as arquivo_out:
 
-        with open(self.caminho, "r", encoding="utf-8") as f_in, open(saida, "wb") as f_out:
-            f_out.write(tam_tabela.to_bytes(4, "big"))
-            f_out.write(tabela_json)
+            arquivo_out.write(tamanho_tabela.to_bytes(4, "big"))
+            arquivo_out.write(tabela_json)
 
-            index_offset_pos = f_out.tell()
-            f_out.write((0).to_bytes(8, "big"))
+            # Reservamos 8 bytes para escrever + tarde a posição do índice
+            pos_offset_indice = arquivo_out.tell()
+            arquivo_out.write((0).to_bytes(8, "big"))
 
             while True:
-                bloco = f_in.read(self.block_size) 
+                bloco = arquivo_in.read(self.tamanho_bloco)
                 if not bloco:
                     break
 
-                bloco_comp_bytes, padding = self._comprimir_bloco_para_bytes(bloco)
+                bloco_compactado, padding = self._comprimir_bloco(bloco)
+                tamanho_compactado = len(bloco_compactado)
 
-                comp_start = f_out.tell()
+                inicio_compactado = arquivo_out.tell()
 
-                comp_size = len(bloco_comp_bytes)
+                arquivo_out.write(tamanho_compactado.to_bytes(4, "big"))
+                arquivo_out.write(bloco_compactado)
 
-                f_out.write(comp_size.to_bytes(4, "big"))
-                if comp_size:
-                    f_out.write(bloco_comp_bytes)
-
+                # Calcula tamanho real do bloco original em bytes
                 bloco_original_bytes = bloco.encode("utf-8")
-                orig_start = current_orig_pos_bytes
-                orig_end = current_orig_pos_bytes + len(bloco_original_bytes) - 1 if len(bloco_original_bytes) > 0 else current_orig_pos_bytes - 1
+                inicio_original = posicao_atual_original
+                fim_original = posicao_atual_original + len(bloco_original_bytes) - 1
 
-                entry = {
-                    "orig_start": orig_start,
-                    "orig_end": orig_end,
-                    "comp_start": comp_start,
-                    "comp_size": comp_size,
+                indice.append({
+                    "orig_start": inicio_original,
+                    "orig_end": fim_original,
+                    "comp_start": inicio_compactado,
+                    "comp_size": tamanho_compactado,
                     "padding": padding
-                }
-                index_entries.append(entry)
+                })
 
-                current_orig_pos_bytes += len(bloco_original_bytes)
+                posicao_atual_original += len(bloco_original_bytes)
 
-            index_start = f_out.tell()
-            index_json = json.dumps(index_entries).encode("utf-8")
-            index_size = len(index_json)
-            f_out.write(index_size.to_bytes(4, "big"))
-            f_out.write(index_json)
+            # Escrever o índice no final do arquivo
+            inicio_indice = arquivo_out.tell()
+            indice_json = json.dumps(indice).encode("utf-8")
+            tamanho_indice = len(indice_json)
 
-            f_out.seek(index_offset_pos)
-            f_out.write(index_start.to_bytes(8, "big"))
+            arquivo_out.write(tamanho_indice.to_bytes(4, "big"))
+            arquivo_out.write(indice_json)
+
+            # Atualiza no início a posição onde o índice começa
+            arquivo_out.seek(pos_offset_indice)
+            arquivo_out.write(inicio_indice.to_bytes(8, "big"))

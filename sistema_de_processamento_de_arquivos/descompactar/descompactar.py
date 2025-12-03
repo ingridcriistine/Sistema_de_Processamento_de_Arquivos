@@ -31,47 +31,58 @@ import json
 #                 f_out.write(codigos_inv[atual])
 #                 atual = ""
 
+def descompactar_bloco(tabela_codigos, bloco_comprimido, bits_de_padding):
+    tabela_invertida = {codigo: char for char, codigo in tabela_codigos.items()}
 
-def descompactar_bloco(codigos, compressed_bytes, padding):
-    codigos_inv = {v: k for k, v in codigos.items()}
-    bits = "".join(f"{byte:08b}" for byte in compressed_bytes)
-    if padding:
-        bits = bits[:-padding]
-    atual = ""
-    out_chars = []
-    for b in bits:
-        atual += b
-        if atual in codigos_inv:
-            out_chars.append(codigos_inv[atual])
-            atual = ""
-    return "".join(out_chars).replace("\n", "")
+    bits = "".join(f"{byte:08b}" for byte in bloco_comprimido)
+
+    if bits_de_padding:
+        bits = bits[:-bits_de_padding]
+
+    buffer_bits = ""
+    resultado_chars = []
+
+    for bit in bits:
+        buffer_bits += bit
+        if buffer_bits in tabela_invertida:
+            resultado_chars.append(tabela_invertida[buffer_bits])
+            buffer_bits = ""
+
+    return "".join(resultado_chars)
 
 
-
-def descompactar(entrada, saida):
+def descompactar(arquivo_entrada, arquivo_saida):
     print("\n=== INICIANDO DESCOMPACTAÇÃO INDEXADA ===")
-    with open(entrada, "rb") as f_in, open(saida, "w", encoding="utf-8") as f_out:
-        tam_tabela = int.from_bytes(f_in.read(4), "big")
-        tabela_json = f_in.read(tam_tabela).decode("utf-8")
-        codigos = json.loads(tabela_json)
 
-        index_offset = int.from_bytes(f_in.read(8), "big")
-        f_in.seek(index_offset)
+    with open(arquivo_entrada, "rb") as f_in, open(arquivo_saida, "w", encoding="utf-8") as f_out:
 
-        index_size = int.from_bytes(f_in.read(4), "big")
-        index_entries = json.loads(f_in.read(index_size).decode("utf-8"))
+        tamanho_tabela = int.from_bytes(f_in.read(4), "big")
+        tabela_json = f_in.read(tamanho_tabela).decode("utf-8")
+        tabela_codigos = json.loads(tabela_json)
 
-        for entry in index_entries:
-            comp_start = entry["comp_start"]
-            comp_size  = entry["comp_size"]
-            padding    = entry["padding"]
+        offset_indice = int.from_bytes(f_in.read(8), "big")
+        f_in.seek(offset_indice)
 
-            f_in.seek(comp_start)
-            actual_comp_size = int.from_bytes(f_in.read(4), "big")
-            if actual_comp_size != comp_size:
-                raise ValueError("comp_size mismatch")
-            bloco_comp = f_in.read(comp_size)
-            texto = descompactar_bloco(codigos, bloco_comp, padding)
+        tamanho_indice = int.from_bytes(f_in.read(4), "big")
+        lista_indices = json.loads(f_in.read(tamanho_indice).decode("utf-8"))
+
+        for info_bloco in lista_indices:
+            pos_compactado = info_bloco["comp_start"]
+            tam_compactado = info_bloco["comp_size"]
+            bits_padding   = info_bloco["padding"]
+
+            # Vai até o bloco
+            f_in.seek(pos_compactado)
+
+            # Lê o tamanho declarado e confere
+            tam_real_lido = int.from_bytes(f_in.read(4), "big")
+            if tam_real_lido != tam_compactado:
+                raise ValueError("Erro: tam_compactado diferente do armazenado.")
+
+            bytes_bloco = f_in.read(tam_compactado)
+
+            texto = descompactar_bloco(tabela_codigos, bytes_bloco, bits_padding)
+
             f_out.write(texto)
 
     print("Descompactação concluída.")

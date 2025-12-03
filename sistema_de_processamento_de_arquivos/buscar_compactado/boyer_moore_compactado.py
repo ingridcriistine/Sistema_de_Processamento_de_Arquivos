@@ -1,77 +1,69 @@
 import json
 
-def descompactar_bloco(codigos, compressed_bytes, padding):
-    codigos_inv = {v: k for k, v in codigos.items()}
-    bits = "".join(f"{byte:08b}" for byte in compressed_bytes)
-    if padding:
-        bits = bits[:-padding]
-    atual = ""
-    out_chars = []
-    for b in bits:
-        atual += b
-        if atual in codigos_inv:
-            out_chars.append(codigos_inv[atual])
-            atual = ""
-    return "".join(out_chars)
+from sistema_de_processamento_de_arquivos.descompactar.descompactar import descompactar_bloco
 
+def buscar_substring_compactado(arquivo_entrada, padrao_busca):
+    print(f"\n=== BUSCANDO '{padrao_busca}' NO ARQUIVO COMPACTADO")
 
-def buscar_substring_compactado(entrada, padrao):
-    print(f"\n=== BUSCANDO '{padrao}' NO ARQUIVO COMPACTADO (INDEXADO) ===")
-    m_chars = len(padrao) 
-    resultados = []
+    tamanho_padrao = len(padrao_busca)
+    resultados_globais = []
 
-    with open(entrada, "rb") as f_in:
-        tam_tabela = int.from_bytes(f_in.read(4), "big")
-        tabela_json = f_in.read(tam_tabela).decode("utf-8")
-        codigos = json.loads(tabela_json)
+    with open(arquivo_entrada, "rb") as f_in:
 
-        index_offset = int.from_bytes(f_in.read(8), "big")
-        f_in.seek(index_offset)
-        index_size = int.from_bytes(f_in.read(4), "big")
-        index_entries = json.loads(f_in.read(index_size).decode("utf-8"))
+        tamanho_tabela = int.from_bytes(f_in.read(4), "big")
+        tabela_json = f_in.read(tamanho_tabela).decode("utf-8")
+        tabela_codigos = json.loads(tabela_json)
 
-        ultimo_final = "" 
+        offset_indice = int.from_bytes(f_in.read(8), "big")
+        f_in.seek(offset_indice)
 
-        for entry in index_entries:
-            orig_start = entry["orig_start"]  
-            orig_end   = entry["orig_end"]
-            comp_start = entry["comp_start"]
-            comp_size  = entry["comp_size"]
-            padding    = entry["padding"]
+        tamanho_indice = int.from_bytes(f_in.read(4), "big")
+        lista_indices = json.loads(f_in.read(tamanho_indice).decode("utf-8"))
 
-            if orig_end < orig_start:
+        ultimo_final = ""
+
+        for bloco in lista_indices:
+            inicio_original = bloco["orig_start"]
+            fim_original    = bloco["orig_end"]
+            pos_compactado  = bloco["comp_start"]
+            tam_compactado  = bloco["comp_size"]
+            bits_padding    = bloco["padding"]
+
+            if fim_original < inicio_original:
                 continue
 
-            f_in.seek(comp_start)
-            actual_comp_size = int.from_bytes(f_in.read(4), "big")
-            if actual_comp_size != comp_size:
-                raise ValueError("comp_size mismatch during search")
-            bloco_comp = f_in.read(comp_size)
+            f_in.seek(pos_compactado)
 
-            texto = descompactar_bloco(codigos, bloco_comp, padding).replace("\n", "")
+            tam_real = int.from_bytes(f_in.read(4), "big")
+            if tam_real != tam_compactado:
+                raise ValueError("Erro no índice: tamanho diferente durante busca.")
+
+            bloco_bytes = f_in.read(tam_compactado)
+
+            texto_bloco = descompactar_bloco(tabela_codigos, bloco_bytes, bits_padding).replace("\n", "")
             ultimo_final = ultimo_final.replace("\n", "")
-            janela = (ultimo_final + texto)
 
+            janela_busca = ultimo_final + texto_bloco
 
-            pos = janela.find(padrao)
-            while pos != -1:
-               
-                if pos >= len(ultimo_final):
-                    dentro = pos - len(ultimo_final)
-                    byte_offset = len(texto[:dentro].encode("utf-8"))
-                    pos_global = orig_start + byte_offset
+            pos_local = janela_busca.find(padrao_busca)
+
+            while pos_local != -1:
+                if pos_local >= len(ultimo_final):
+                    pos_relativo = pos_local - len(ultimo_final)
+                    deslocamento_bytes = len(texto_bloco[:pos_relativo].encode("utf-8"))
+                    pos_global = inicio_original + deslocamento_bytes
                 else:
-                    ajuste_prev = orig_start - len(ultimo_final.encode("utf-8"))
-                    byte_offset = len(janela[:pos].encode("utf-8"))
-                    pos_global = ajuste_prev + byte_offset
+                    deslocamento_pre = inicio_original - len(ultimo_final.encode("utf-8"))
+                    deslocamento_bytes = len(janela_busca[:pos_local].encode("utf-8"))
+                    pos_global = deslocamento_pre + deslocamento_bytes
 
-                resultados.append(pos_global)
-                                
-                pos = janela.find(padrao, pos + 1)
+                resultados_globais.append(pos_global)
 
-            if m_chars > 1:
-                ultimo_final = (ultimo_final + texto)[- (m_chars - 1):] if (m_chars - 1) > 0 else ""
+                pos_local = janela_busca.find(padrao_busca, pos_local + 1)
+
+            if tamanho_padrao > 1:
+                ultimo_final = janela_busca[-(tamanho_padrao - 1):]
             else:
                 ultimo_final = ""
 
-    return resultados
+    return resultados_globais
