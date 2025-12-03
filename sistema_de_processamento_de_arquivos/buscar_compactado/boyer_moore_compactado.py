@@ -61,6 +61,7 @@ def buscar_substring_compactado(arquivo_entrada, padrao_busca):
 
                 pos_local = janela_busca.find(padrao_busca, pos_local + 1)
 
+            # Atualiza resto para capturar fronteira com próximo bloco
             if tamanho_padrao > 1:
                 ultimo_final = janela_busca[-(tamanho_padrao - 1):]
             else:
