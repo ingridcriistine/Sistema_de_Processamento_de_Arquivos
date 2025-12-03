@@ -85,4 +85,52 @@ substrings diretamente no arquivo compactado, de forma eficiente e sem a necessi
  A utilização da função facilitou os testes do algoritmo e permitiu a criação de arquivos com diferentes tamanho de forma simples e rápida.
 - **Referência no Código:** A implementação está no arqivo `gerador_arqivos.py`.
 
+
+ ### Interação 5
+
+- **Data**: 30/11/2025
+- **Etapa do Projeto**: Busca de substring em um arquivo compactado
+- **Ferramenta de IA Utilizada**: ChatGPT
+- **Objetivo da Consulta**: Entender o funcionamento completo da compactação por blocos.
+- **Prompt(s) Utilizado(s):**
+1. "Como funciona a compactação por blocos?"
+2. "Preciso compreender como criar um índice de blocos comprimidos.
+- **Resumo da Resposta da IA**:
+A IA explicou que a compactação por blocos consiste em dividir o arquivo original em partes de tamanho fixo, comprimir cada uma separadamente e criar um índice mapeando cada bloco original ao seu bloco comprimido. Esse índice contém informações como offset, tamanho comprimido e opcionalmente o tamanho original, permitindo acesso rápido e busca eficiente. A IA detalhou:
+  Divisão do arquivo em blocos (ex.: 4096 bytes)
+  Compressão individual de cada bloco
+  Construção do índice na parte inicial do arquivo comprimido
+  Processo de busca que descompacta apenas os blocos necessários
+  Tratamento de padrões que atravessam fronteiras entre blocos
+- **Análise e Aplicação**:
+O conceito forneceu a fundamentação necessária para estruturar o arquivo compactado conforme os requisitos da Etapa 3 do projeto, permitindo criar:
+  o índice de blocos
+  o mecanismo de acesso direto a blocos comprimidos
+  a busca otimizada usando apenas segmentos específicos
+Além disso, a explicação serviu para construir a justificativa técnica da arquitetura de compressão no relatório.
+- **Referência no Código**: lendo_arquivo -  SegundaLeituraStreaming
+ 
+ ### Interação 6
+
+- **Data**: 01/12/2025
+- **Etapa do Projeto**: Implementação da busca de substring no arquivo compactado
+- **Ferramenta de IA Utilizada**: ChatGPT
+- **Objetivo da Consulta**: Entender como determinar qual bloco comprimido deve ser descompactado durante a busca.
+- **Prompt(s) Utilizado(s)**:
+"Como que ele sabe qual bloco descompactar?"
+- **Resumo da Resposta da IA**:
+A IA explicou que o sistema identifica o bloco correto usando o índice gerado na etapa de compactação.
+Durante a busca, quando uma posição estimada ou real é encontrada no arquivo original, o programa calcula o número do bloco usando a operação: 
+Assim descobre-se qual bloco contém a região onde a substring pode estar.
+A partir desse número de bloco, consulta-se o índice para obter:
+  offset — onde o bloco comprimido começa no arquivo .bin
+  tamanho comprimido — quantos bytes devem ser lidos
+Com essas informações, apenas o bloco necessário é descompactado, tornando a busca eficiente e evitando descompressão total.
+- **Análise e Aplicação**:
+Esse conceito permitiu implementar a busca em arquivos compactados de forma segmentada.
+Além disso, viabilizou tratar casos de fronteiras pois agora o programa sabe exatamente quais blocos vizinhos devem ser carregados quando necessário.
+Esse mecanismo é fundamental para cumprir o requisito do projeto de busca rápida usando o índice.
+- **Referência no Código**: descompactar_bloco
+
+
 ---
